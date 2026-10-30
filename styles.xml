@@ -1,0 +1,535 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Module>
+<ModulePrefs title="classrsoomgoogle" />
+<Content type="html"><![CDATA[
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="initial-scale=1, width=device-width"/>
+<title>spirall roll</title>
+<style>
+html,body{margin:0;padding:0;width:100%;height:100%;font-size:12px;background:#0b0705;
+ -webkit-touch-callout:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}
+*{overflow:hidden}
+#boot{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;flex-direction:column}
+#boot.gone{display:none}
+#bootbg{position:absolute;inset:0;background-position:center center;background-size:cover;filter:saturate(.85) contrast(1.05)}
+#bootveil{position:absolute;inset:0;
+ background:radial-gradient(120% 90% at 50% 38%, rgba(255,138,31,.20) 0%, rgba(11,7,5,.72) 55%, rgba(11,7,5,.94) 100%)}
+#bootin{position:relative;display:flex;flex-direction:column;align-items:center;gap:14px;padding:0 20px;text-align:center}
+#btitle{margin:0;font:700 clamp(15px,2.2vw,19px)/1.25 system-ui,-apple-system,"Segoe UI",sans-serif;
+ letter-spacing:.2em;text-transform:uppercase;color:#ffb259;text-shadow:0 2px 18px rgba(255,138,31,.45),0 1px 2px rgba(0,0,0,.7)}
+#brule{width:54px;height:2px;border-radius:2px;background:linear-gradient(90deg,rgba(255,138,31,0),#ff8a1f,rgba(255,138,31,0))}
+#bbar{position:relative;width:min(320px,62vw);height:5px;border-radius:999px;background:rgba(255,255,255,.12);
+ overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,138,31,.18)}
+#bfill{width:0%;height:100%;border-radius:inherit;background:linear-gradient(90deg,#ff7a0d,#ffc46b);
+ transition:width .25s ease;box-shadow:0 0 14px rgba(255,138,31,.6)}
+#btxt{font:600 10px/1 ui-monospace,Consolas,monospace;letter-spacing:.26em;color:#f0c79a;opacity:.85}
+#brl{display:none;margin-top:4px;font:700 11px/1 system-ui,sans-serif;letter-spacing:.14em;padding:10px 26px;border:0;
+ border-radius:999px;background:linear-gradient(90deg,#ff7a0d,#ffb259);color:#2a1403;cursor:pointer}
+#boot.err #brl{display:block}
+#boot.err #btxt{color:#ffb3a0;letter-spacing:.06em;max-width:min(420px,88vw);line-height:1.6;font-size:11px}
+#boot.err #bfill{background:linear-gradient(90deg,#c0392b,#e8674f)}
+@media (prefers-reduced-motion:reduce){#bfill{transition:none}}
+</style>
+</head>
+<body>
+<div id="boot">
+  <div id="bootbg"></div><div id="bootveil"></div>
+  <div id="bootin">
+    <h3 id="btitle">Classroom Resources</h3>
+    <div id="brule"></div>
+    <div id="bbar"><div id="bfill"></div></div>
+    <div id="btxt">LOADING 0%</div>
+    <button id="brl" onclick="location.reload()">RELOAD</button>
+  </div>
+</div>
+<div id="root"></div>
+
+<script>
+window.F = {
+  "bot_emscripten_wasm32-_UT8vnK3.wasm": "https://cdn.jsdelivr.net/gh/tyuuunicorn/rbulox@main/bot_emscripten_wasm32-_UT8vnK3.wasm",
+  "client_emscripten_wasm32-B8wrzvvT.wasm": "https://cdn.jsdelivr.net/gh/tyuuunicorn/rbulox@main/client_emscripten_wasm32-B8wrzvvT.wasm",
+  "crossfire.bsp-2fX3FfnW.webp": "https://cdn.jsdelivr.net/gh/tyuuunicorn/rbulox@main/crossfire.bsp-2fX3FfnW.webp",
+  "filesystem_stdio-DBiLmSxk.wasm": "https://cdn.jsdelivr.net/gh/tyuuunicorn/rbulox@main/filesystem_stdio-DBiLmSxk.wasm",
+  "FiraSans-Regular-BN6hITtY.ttf": "https://cdn.jsdelivr.net/gh/tyuuunicorn/rbulox@main/FiraSans-Regular-BN6hITtY.ttf",
+  "hldm-D1X4HkNG.png": "https://cdn.jsdelivr.net/gh/tyuuunicorn/rbulox@main/hldm-D1X4HkNG.png",
+  "index-BORoamJR.js": "https://cdn.jsdelivr.net/gh/tyuuunicorn/rbulox@main/index-BORoamJR.js",
+  "Launcher-DlEgIUBT.js": "https://cdn.jsdelivr.net/gh/tyuuunicorn/rbulox@main/Launcher-DlEgIUBT.js",
+  "libref_webgl2-Dp0z5xFS.wasm": "https://cdn.jsdelivr.net/gh/tyuuunicorn/rbulox@main/libref_webgl2-Dp0z5xFS.wasm",
+  "xash-iHQixqHD.wasm": "https://cdn.jsdelivr.net/gh/tyuuunicorn/rbulox@main/xash-iHQixqHD.wasm"
+};
+
+window.DATA_TOTAL = 74404124;
+window.DATA_PARTS = [
+  { url: "https://cdn.jsdelivr.net/gh/unboxstreamsettings/styles@main/data.p0.js", size: 8388608 },
+  { url: "https://cdn.jsdelivr.net/gh/unboxstreamsettings/styles@main/data.p1.js", size: 8388608 },
+  { url: "https://cdn.jsdelivr.net/gh/unboxstreamsettings/styles@main/data.p2.js", size: 8388608 },
+  { url: "https://cdn.jsdelivr.net/gh/unboxstreamsettings/styles@main/data.p3.js", size: 8388608 },
+  { url: "https://cdn.jsdelivr.net/gh/unboxstreamsettings/styles@main/data.p4.js", size: 8388608 },
+  { url: "https://cdn.jsdelivr.net/gh/unboxstreamsettings/settings@main/data.p5.js", size: 8388608 },
+  { url: "https://cdn.jsdelivr.net/gh/unboxstreamsettings/settings@main/data.p6.js", size: 8388608 },
+  { url: "https://cdn.jsdelivr.net/gh/unboxstreamsettings/settings@main/data.p7.js", size: 8388608 },
+  { url: "https://cdn.jsdelivr.net/gh/unboxstreamsettings/settings@main/data.p8.js", size: 7295260 }
+];
+</script>
+
+<script>
+try {
+  var want = new URL('../index.html', window.F['index-BORoamJR.js']).pathname;
+  if (location.pathname !== want || location.search) history.replaceState(null, '', want);
+} catch (e) {}
+</script>
+
+<script>
+(function () {
+  function noop() {}
+  function ok(v) { return function () { return Promise.resolve(v); }; }
+  function advCall(o, n, a) { try { if (o && o.callbacks && typeof o.callbacks[n] === 'function') o.callbacks[n](a); } catch (e) {} }
+
+  var player = {
+    getUniqueID: function () { return 'local'; },
+    getName: function () { return 'Player'; },
+    getPhoto: function () { return ''; },
+    getMode: function () { return 'lite'; },
+    getData: function () { var d = {}; try { d = JSON.parse(localStorage.getItem('cr_save') || '{}'); } catch (e) {} return Promise.resolve(d); },
+    setData: function (d) { try { localStorage.setItem('cr_save', JSON.stringify(d || {})); } catch (e) {} return Promise.resolve(); },
+    getStats: ok({}), setStats: ok(), incrementStats: ok({}),
+    signIn: function () { return Promise.reject(new Error('no auth')); }
+  };
+
+  var sdk = {
+    dispatchEvent: function () { return Promise.resolve(); },
+    environment: { app: { id: 'local' }, browser: { lang: 'en' }, i18n: { lang: 'en', tld: 'com' }, payload: null },
+    deviceInfo: { type: 'desktop', isDesktop: function () { return true; }, isMobile: function () { return false; },
+                  isTablet: function () { return false; }, isTV: function () { return false; } },
+    adv: {
+      showFullscreenAdv: function (o) { setTimeout(function () { advCall(o, 'onClose', false); }, 0); },
+      showRewardedVideo: function (o) { setTimeout(function () { advCall(o, 'onOpen'); advCall(o, 'onRewarded'); advCall(o, 'onClose'); }, 0); },
+      showBannerAdv: ok({ reason: 'unknown' }), hideBannerAdv: ok({}),
+      getBannerAdvStatus: ok({ stickyAdvIsShowing: false })
+    },
+    features: { LoadingAPI: { ready: noop }, GameplayAPI: { start: noop, stop: noop } },
+    screen: { fullscreen: { status: 'off', request: ok(), exit: ok() } },
+    getPlayer: ok(player),
+    getLeaderboards: ok({ getLeaderboardDescription: ok({}),
+      getLeaderboardPlayerEntry: function () { return Promise.reject(new Error('no entry')); },
+      getLeaderboardEntries: ok({ entries: [] }), setLeaderboardScore: ok() }),
+    getPayments: ok({ purchase: ok({}), getPurchases: ok([]), getCatalog: ok([]), consumePurchase: ok() }),
+    getStorage: ok(window.localStorage), getFlags: ok({}), isAvailableMethod: ok(false),
+    clipboard: { writeText: ok() },
+    shortcut: { canShowPrompt: ok({ canShow: false }), showPrompt: ok({ outcome: 'rejected' }) },
+    feedback: { canReview: ok({ value: false }), requestReview: ok({ feedbackSent: false }) },
+    EVENTS: {}, on: noop, off: noop
+  };
+  window.ysdk = sdk;
+  window.YaGames = { init: function () { return Promise.resolve(sdk); } };
+})();
+</script>
+
+<script>
+(function () {
+  var F = window.F;
+  var boot = document.getElementById('boot'), txt = document.getElementById('btxt'), fill = document.getElementById('bfill');
+  var shown = 0;
+
+  document.getElementById('bootbg').style.backgroundImage = 'url("' + F['hldm-D1X4HkNG.png'] + '")';
+
+  function setPct(p) {
+    p = Math.max(0, Math.min(100, p | 0));
+    if (p < shown) return;
+    shown = p; fill.style.width = p + '%'; txt.textContent = 'LOADING ' + p + '%';
+  }
+  function fail(m) { boot.classList.add('err'); txt.textContent = m; fill.style.width = '100%'; }
+
+  var KEYS = Object.keys(F).sort(function (a, b) { return b.length - a.length; });
+  function lookup(raw) {
+    var u = String(raw || '');
+    if (!u || /^(blob:|data:)/i.test(u)) return null;
+    var p = u.split('#')[0].split('?')[0];
+    for (var i = 0; i < KEYS.length; i++) {
+      var k = KEYS[i];
+      if (p === k || p.slice(-(k.length + 1)) === '/' + k) return F[k];
+    }
+    return null;
+  }
+  function named(u, name) {
+    var p = String(u || '').split('#')[0].split('?')[0];
+    return p === name || p.slice(-(name.length + 1)) === '/' + name;
+  }
+  function urlOf(x) {
+    if (typeof x === 'string') return x;
+    if (x && typeof x.url === 'string') return x.url;
+    if (x && typeof x.href === 'string') return x.href;
+    try { return String(x || ''); } catch (e) { return ''; }
+  }
+
+  var DB = 'cr_cache', STORE = 'f', TTL = 365 * 24 * 60 * 60 * 1000;
+  var MIN_FREE = 300 * 1024 * 1024;
+  var dbp = null, cacheOn = !!window.indexedDB, roomy = true;
+
+  try {
+    if (navigator.storage && navigator.storage.persist)
+      navigator.storage.persisted().then(function (o) { if (!o) navigator.storage.persist(); });
+    if (navigator.storage && navigator.storage.estimate)
+      navigator.storage.estimate().then(function (s) {
+        if (s && s.quota !== undefined && s.usage !== undefined && (s.quota - s.usage) < MIN_FREE) roomy = false;
+      });
+  } catch (e) {}
+
+  function db() {
+    if (!cacheOn) return Promise.resolve(null);
+    return dbp || (dbp = new Promise(function (res) {
+      var rq;
+      try { rq = indexedDB.open(DB, 1); } catch (e) { cacheOn = false; return res(null); }
+      rq.onupgradeneeded = function () { try { rq.result.createObjectStore(STORE); } catch (e) {} };
+      rq.onsuccess = function () { res(rq.result); };
+      rq.onerror = function () { cacheOn = false; res(null); };
+    }));
+  }
+  function cGet(k) {
+    return db().then(function (d) {
+      if (!d) return null;
+      return new Promise(function (res) {
+        try {
+          var r = d.transaction(STORE, 'readonly').objectStore(STORE).get(k);
+          r.onsuccess = function () { var v = r.result; res(v && v.b && (Date.now() - v.t) < TTL ? v : null); };
+          r.onerror = function () { res(null); };
+        } catch (e) { res(null); }
+      });
+    }).catch(function () { return null; });
+  }
+  function cPut(k, b, c) {
+    if (!roomy) return Promise.resolve();
+    return db().then(function (d) {
+      if (!d) return;
+      try {
+        var tx = d.transaction(STORE, 'readwrite');
+        tx.onerror = function () { roomy = false; };
+        tx.objectStore(STORE).put({ b: b, c: c || '', t: Date.now() }, k);
+      } catch (e) { roomy = false; }
+    }).catch(function () {});
+  }
+  (function () {
+    db().then(function (d) {
+      if (!d) return;
+      try {
+        var cur = d.transaction(STORE, 'readwrite').objectStore(STORE).openCursor();
+        cur.onsuccess = function () {
+          var c = cur.result; if (!c) return;
+          var v = c.value;
+          if (!v || !v.t || (Date.now() - v.t) >= TTL) { try { c.delete(); } catch (e) {} }
+          c.continue();
+        };
+      } catch (e) {}
+    });
+  })();
+
+  var _fetch = window.fetch.bind(window);
+
+  function grab(url) {
+    return cGet(url).then(function (hit) {
+      if (hit) return { b: hit.b, c: hit.c, cached: true };
+      return _fetch(url).then(function (r) {
+        if (!r.ok) throw new Error(r.status + ' ' + url.split('/').pop());
+        var c = r.headers.get('content-type') || '';
+        return r.arrayBuffer().then(function (b) { cPut(url, b, c); return { b: b, c: c, cached: false }; });
+      });
+    });
+  }
+
+  function merged(parts, total, type, onPct) {
+    var i = 0, sent = 0;
+    var stream = new ReadableStream({
+      pull: function (c) {
+        if (i >= parts.length) { c.close(); return; }
+        var p = parts[i++];
+        return grab(p.url).then(function (res) {
+          sent += res.b.byteLength;
+          if (onPct) onPct(sent / total);
+          c.enqueue(new Uint8Array(res.b));
+        }, function (e) { c.error(e); });
+      }
+    });
+    return new Response(stream, { status: 200, headers: { 'Content-Type': type, 'Content-Length': String(total) } });
+  }
+
+  function hasDylink(u8) {
+    var p = 8;
+    while (p < u8.length) {
+      var id = u8[p++], sz = 0, sh = 0, b;
+      do { b = u8[p++]; sz += (b & 127) * Math.pow(2, sh); sh += 7; } while (b & 128);
+      if (id === 0) {
+        var q = p, nl = 0, ns = 0, nb;
+        do { nb = u8[q++]; nl += (nb & 127) * Math.pow(2, ns); ns += 7; } while (nb & 128);
+        var nm = '';
+        for (var i = 0; i < nl; i++) nm += String.fromCharCode(u8[q + i]);
+        if (nm.indexOf('dylink') === 0) return true;
+      }
+      p += sz;
+    }
+    return false;
+  }
+  function addDylink(buf) {
+    var u8 = new Uint8Array(buf);
+    if (u8.length < 8 || u8[0] !== 0 || u8[1] !== 0x61 || u8[2] !== 0x73 || u8[3] !== 0x6d) return buf;
+    try { if (hasDylink(u8)) return buf; } catch (e) { return buf; }
+    var sec = new Uint8Array([0, 15, 8, 100, 121, 108, 105, 110, 107, 46, 48, 1, 4, 0, 0, 0, 0]);
+    var out = new Uint8Array(u8.length + sec.length);
+    out.set(u8.subarray(0, 8), 0); out.set(sec, 8); out.set(u8.subarray(8), 8 + sec.length);
+    return out.buffer;
+  }
+
+  var GAP = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
+  function blank() {
+    var raw = atob(GAP), u8 = new Uint8Array(raw.length);
+    for (var i = 0; i < raw.length; i++) u8[i] = raw.charCodeAt(i);
+    return new Response(u8, { status: 200, headers: { 'Content-Type': 'image/png' } });
+  }
+
+  function redirect(input, init, target) {
+    if (typeof Request !== 'undefined' && input instanceof Request) return _fetch(new Request(target, input));
+    return _fetch(target, init);
+  }
+
+  window.fetch = function (input, init) {
+    var url = urlOf(input);
+
+    if (named(url, 'data-B-Y9J8oy.zip'))
+      return Promise.resolve(merged(window.DATA_PARTS, window.DATA_TOTAL, 'application/zip', null));
+
+    if (named(url, 'xash-iHQixqHD.wasm')) {
+      setPct(12);
+      return grab(F['xash-iHQixqHD.wasm']).then(function (res) {
+        setPct(55);
+        return new Response(addDylink(res.b), { status: 200, headers: { 'Content-Type': 'application/wasm' } });
+      });
+    }
+
+    if (/\.bsp-[A-Za-z0-9_-]+\.webp$/i.test(url) || /icon-[A-Za-z0-9_-]+\.png$/i.test(url)) {
+      var k = lookup(url);
+      if (!k) return Promise.resolve(blank());
+      return grab(k).then(function (res) {
+        return new Response(res.b, { status: 200, headers: { 'Content-Type': res.c || 'image/webp' } });
+      });
+    }
+
+    var hit = lookup(url);
+    if (!hit || (init && init.method && init.method !== 'GET')) return hit ? redirect(input, init, hit) : _fetch(input, init);
+    return grab(hit).then(function (res) {
+      return new Response(res.b, { status: 200, headers: res.c ? { 'Content-Type': res.c } : {} });
+    }, function () { return redirect(input, init, hit); });
+  };
+
+  try {
+    var XP = XMLHttpRequest.prototype, _xo = XP.open;
+    XP.open = function (m, u) { var h = lookup(urlOf(u)); if (h) arguments[1] = h; return _xo.apply(this, arguments); };
+  } catch (e) {}
+
+  (function () {
+    function scrub() {
+      try {
+        var el = document.querySelectorAll('input,textarea');
+        for (var i = 0; i < el.length; i++) {
+          var v = el[i].value;
+          if (typeof v === 'string' && v.indexOf('yandex') >= 0) {
+            el[i].value = '';
+            el[i].setAttribute('value', '');
+            el[i].placeholder = '';
+          }
+        }
+        var a = document.querySelectorAll('a[href*="yandex"]');
+        for (var j = 0; j < a.length; j++) { a[j].removeAttribute('href'); a[j].textContent = ''; }
+      } catch (e) {}
+    }
+    try { new MutationObserver(scrub).observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['value', 'href'] }); } catch (e) {}
+    setInterval(scrub, 400);
+  })();
+
+  setPct(3);
+  var creep = setInterval(function () { if (shown < 12) setPct(shown + 1); }, 240);
+
+  var s = document.createElement('script');
+  s.type = 'module';
+  s.crossOrigin = '';
+  s.src = F['index-BORoamJR.js'];
+  s.onerror = function () { clearInterval(creep); fail('The game could not start. Main script failed to load.'); };
+  s.onload = function () {
+    var root = document.getElementById('root');
+    var wait = setInterval(function () {
+      if (root && root.children.length) {
+        clearInterval(wait); clearInterval(creep); setPct(100);
+        setTimeout(function () { boot.classList.add('gone'); }, 450);
+      }
+    }, 150);
+    setTimeout(function () { clearInterval(wait); clearInterval(creep); boot.classList.add('gone'); }, 90000);
+  };
+  document.body.appendChild(s);
+})();
+</script>
+<!-- Sticky Bottom Center Ad (728x90) with Smooth Slide-Out and Reappearance -->
+<style>
+  /* Container: Bottom center, fixed, with overflow hidden */
+  #ad-container {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(728px, calc(100% - 20px)); /* 728px, 10px margin on mobile */
+    height: 90px;
+    background: rgba(0, 0, 0, 0.90);
+    display: none;
+    z-index: 99999;
+    border-radius: 0; /* Sharp corners */
+    overflow: hidden;
+    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.45);
+    box-sizing: border-box;
+    transition: transform 0.5s ease-in-out; /* Smooth slide-in/out animation */
+  }
+
+  /* Slide-out animation */
+  #ad-container.hidden {
+    transform: translate(-50%, 100%); /* Slide down out of view */
+  }
+
+  #ad-iframe {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 745px; /* Updated width */
+    height: 90px; /* Updated height */
+    border: 0;
+    display: block;
+    overflow: hidden;
+    pointer-events: auto;
+    box-sizing: content-box;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  #ad-iframe::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  /* Close button with arrow */
+  #close-ad {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    background: #ff4d4d;
+    color: #fff;
+    border: none;
+    padding: 5px 9px;
+    font-size: 13px;
+    border-radius: 4px;
+    cursor: not-allowed;
+    opacity: 0.72;
+    z-index: 100000;
+    display: flex;
+    align-items: center;
+  }
+  #close-ad.enabled {
+    cursor: pointer;
+    opacity: 1;
+  }
+  #close-ad::before {
+    content: '↓'; /* Down arrow for bottom ad */
+    margin-right: 4px;
+  }
+
+  /* Right mask for scrollbar */
+  #ad-right-mask {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 12px;
+    height: 100%;
+    pointer-events: none;
+    background: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.9));
+    z-index: 99999;
+  }
+
+  /* Mobile adjustments */
+  @media (max-width: 440px) {
+    #ad-container {
+      width: calc(100% - 12px);
+      left: 50%;
+      transform: translateX(-50%);
+      border-radius: 0; /* Sharp corners on mobile */
+    }
+    #ad-iframe {
+      width: 728px;
+    }
+  }
+</style>
+
+<div id="ad-container" aria-hidden="true" role="dialog" aria-label="Advertisement">
+  <iframe
+    id="ad-iframe"
+    src="https://script.google.com/macros/s/AKfycbzNG4z_PlG6Ke_bX5wSPKK2uBRB3IY9ouVzqM1shucYhSTvsJWRmyMyZaaC2z5S3ADN/exec"
+    width="768px"
+    height="95px"
+    scrolling="no"
+    frameborder="0"
+    sandbox="allow-scripts allow-popups allow-same-origin"
+  ></iframe>
+  <button id="close-ad" disabled>Close (12)</button>
+  <div id="ad-right-mask"></div>
+</div>
+
+<script>
+  (function () {
+    const showDelay = 2000; // 2 seconds delay before first show
+    const countdownStart = 12; // 12 seconds countdown
+    const reappearDelay = 150000; // 25 seconds before reappearance
+    const adContainer = document.getElementById('ad-container');
+    const closeBtn = document.getElementById('close-ad');
+
+    function showAd() {
+      // Show ad with smooth slide-in
+      adContainer.style.display = 'block';
+      adContainer.classList.remove('hidden');
+      adContainer.setAttribute('aria-hidden', 'false');
+
+      // Start countdown
+      let timeLeft = countdownStart;
+      closeBtn.textContent = `Close (${timeLeft})`;
+      closeBtn.disabled = true;
+      closeBtn.classList.remove('enabled');
+
+      const t = setInterval(() => {
+        timeLeft--;
+        if (timeLeft > 0) {
+          closeBtn.textContent = `Close (${timeLeft})`;
+        } else {
+          clearInterval(t);
+          closeBtn.disabled = false;
+          closeBtn.classList.add('enabled');
+          closeBtn.textContent = 'Close ↓';
+        }
+      }, 1000);
+    }
+
+    // Initial ad show
+    setTimeout(showAd, showDelay);
+
+    // Close with animation and schedule reappearance
+    closeBtn.addEventListener('click', () => {
+      if (closeBtn.disabled) return;
+      adContainer.classList.add('hidden');
+      adContainer.setAttribute('aria-hidden', 'true');
+      // Schedule reappearance without removing or reloading iframe
+      setTimeout(showAd, reappearDelay);
+    });
+  })();
+</script>
+</body>
+</html>
+
+]]></Content>
+</Module>
