@@ -37,23 +37,6 @@ html,body{margin:0;padding:0;width:100%;height:100%;font-size:12px;background:#0
 #boot.err #btxt{color:#ffb3a0;letter-spacing:.06em;max-width:min(420px,88vw);line-height:1.6;font-size:11px}
 #boot.err #bfill{background:linear-gradient(90deg,#c0392b,#e8674f)}
 
-#crlog{position:fixed;right:8px;bottom:8px;z-index:100001;width:min(360px,80vw);
- background:rgba(12,7,3,.90);border:1px solid rgba(255,138,31,.40);border-radius:10px;
- box-shadow:0 6px 22px rgba(0,0,0,.5);font:400 10px/1.5 ui-monospace,Consolas,monospace;color:#ffd2a1;overflow:hidden}
-#crlog .hd{display:flex;align-items:center;gap:6px;padding:5px 7px;background:rgba(255,138,31,.14);
- border-bottom:1px solid rgba(255,138,31,.25);font:700 10px/1 system-ui,sans-serif;letter-spacing:.12em;color:#ffb259}
-#crlog .hd b{flex:1}
-#crlog .hd button{border:0;border-radius:5px;padding:4px 8px;cursor:pointer;font:700 9px/1 system-ui,sans-serif;
- letter-spacing:.08em;background:rgba(255,138,31,.85);color:#2a1403}
-#crlog .hd button.gh{background:rgba(255,255,255,.14);color:#ffd2a1}
-#crlog .bd{height:112px;overflow-y:auto;overflow-x:hidden;padding:5px 7px;white-space:pre-wrap;word-break:break-word;
- user-select:text;-webkit-user-select:text}
-#crlog.min .bd{display:none}
-#crlog .e{color:#ff9a8a}
-#crlog .w{color:#ffcf7a}
-#crlog .i{color:#9fd8ff}
-#crlog .ok{color:#9ae6a0}
-@media (max-width:640px){#crlog{width:84vw}#crlog .bd{height:84px}}
 @media (prefers-reduced-motion:reduce){#bfill{transition:none}#bootbg{animation:none;transform:none}#boot{transition:none}}
 </style>
 </head>
@@ -69,121 +52,9 @@ html,body{margin:0;padding:0;width:100%;height:100%;font-size:12px;background:#0
   </div>
 </div>
 <div id="root"></div>
-<div id="crlog"><div class="hd"><b>GAME LOG</b><button id="crcopy">COPY</button><button id="crmin" class="gh">&#8211;</button></div><div class="bd" id="crbody"></div></div>
 
 
 
-<script>
-(function () {
-  var MAX = 400, LINES = [], pend = [], raf = 0;
-  var box = document.getElementById('crlog'), body = document.getElementById('crbody');
-
-  function head() {
-    var n = navigator, out = [];
-    out.push('--- REPORT ---');
-    out.push('time  : ' + new Date().toISOString());
-    out.push('ua    : ' + (n.userAgent || '').slice(0, 150));
-    out.push('ram   : ' + (n.deviceMemory || '?') + ' GB   cores: ' + (n.hardwareConcurrency || '?'));
-    out.push('screen: ' + screen.width + 'x' + screen.height + '  win: ' + innerWidth + 'x' + innerHeight);
-    out.push('page  : ' + location.pathname);
-    return out.join('\n');
-  }
-
-  function flush() {
-    raf = 0;
-    if (!pend.length) return;
-    var frag = document.createDocumentFragment();
-    for (var i = 0; i < pend.length; i++) {
-      var d = document.createElement('div');
-      d.className = pend[i].c;
-      d.textContent = pend[i].t;
-      frag.appendChild(d);
-    }
-    pend.length = 0;
-    body.appendChild(frag);
-    while (body.childNodes.length > MAX) body.removeChild(body.firstChild);
-    body.scrollTop = body.scrollHeight;
-  }
-
-  function add(cls, msg) {
-    var t = String(msg);
-    if (t.length > 300) t = t.slice(0, 300) + '...';
-    var sec = ((Date.now() - T0) / 1000).toFixed(1);
-    var line = sec + 's ' + t;
-    LINES.push(line);
-    if (LINES.length > MAX) LINES.shift();
-    pend.push({ c: cls, t: line });
-    if (pend.length > 60) pend.splice(0, pend.length - 60);
-    if (!raf) raf = requestAnimationFrame(flush);
-  }
-  var T0 = Date.now();
-  window.__log = add;
-
-  function fmt(args) {
-    var o = [];
-    for (var i = 0; i < args.length; i++) {
-      var a = args[i];
-      try {
-        if (a instanceof Error) o.push(a.message);
-        else if (typeof a === 'object' && a !== null) o.push(JSON.stringify(a).slice(0, 160));
-        else o.push(String(a));
-      } catch (e) { o.push('[?]'); }
-    }
-    return o.join(' ');
-  }
-  ['log', 'info', 'warn', 'error', 'debug'].forEach(function (k) {
-    var orig = console[k] ? console[k].bind(console) : function () {};
-    console[k] = function () {
-      try { add(k === 'error' ? 'e' : k === 'warn' ? 'w' : k === 'info' ? 'i' : '', fmt(arguments)); } catch (e) {}
-      try { orig.apply(null, arguments); } catch (e) {}
-    };
-  });
-
-  window.addEventListener('error', function (e) {
-    var m = (e && (e.message || '')) + (e && e.filename ? '  @' + String(e.filename).split('/').pop() + ':' + e.lineno : '');
-    add('e', 'ERROR ' + m);
-  });
-  window.addEventListener('unhandledrejection', function (e) {
-    var r = e && e.reason;
-    add('e', 'PROMISE ' + ((r && (r.message || r)) || '?'));
-  });
-
-  document.getElementById('crmin').onclick = function () {
-    box.classList.toggle('min');
-    this.innerHTML = box.classList.contains('min') ? '+' : '&#8211;';
-  };
-
-  document.getElementById('crcopy').onclick = function () {
-    var self = this, txt = head() + '\n' + LINES.join('\n');
-    function done(okFlag) {
-      self.textContent = okFlag ? 'COPIED' : 'SELECT + CTRL C';
-      setTimeout(function () { self.textContent = 'COPY'; }, 2200);
-      try { var cv = document.querySelector('canvas'); if (cv) cv.focus(); } catch (e) {}
-    }
-    try {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(txt).then(function () { done(true); }, function () { fallback(); });
-        return;
-      }
-    } catch (e) {}
-    fallback();
-    function fallback() {
-      try {
-        var ta = document.createElement('textarea');
-        ta.value = txt;
-        ta.style.cssText = 'position:fixed;left:0;top:0;opacity:0;width:10px;height:10px';
-        document.body.appendChild(ta);
-        ta.select(); ta.setSelectionRange(0, txt.length);
-        var okFlag = document.execCommand('copy');
-        document.body.removeChild(ta);
-        done(okFlag);
-      } catch (e) { done(false); }
-    }
-  };
-
-  add('i', 'log started');
-})();
-</script>
 
 <script>
 window.F = {
@@ -822,21 +693,6 @@ function makeMemIDB() {
     });
   }
 
-  function askFeedback() {
-    if (document.getElementById('crfb')) return;
-    var n = document.createElement('div');
-    n.id = 'crfb';
-    n.style.cssText = 'position:fixed;left:10px;bottom:10px;z-index:100000;max-width:min(300px,76vw);' +
-      'padding:10px 30px 10px 13px;border-radius:10px;background:rgba(16,9,4,.88);border:1px solid rgba(255,138,31,.35);' +
-      'color:#ffd2a1;font:500 11px/1.55 system-ui,-apple-system,sans-serif;box-shadow:0 6px 20px rgba(0,0,0,.45);opacity:0;transition:opacity .4s';
-    n.innerHTML = 'Did the game open properly? Please tell us with the Google Form on the left so we can fix problems.' +
-      '<span style="position:absolute;right:8px;top:6px;cursor:pointer;color:#ff9b45;font:700 13px/1 system-ui,sans-serif">&#10005;</span>';
-    n.querySelector('span').onclick = function () { if (n.parentNode) n.parentNode.removeChild(n); };
-    document.body.appendChild(n);
-    setTimeout(function () { n.style.opacity = '1'; }, 30);
-    setTimeout(function () { if (n.parentNode) { n.style.opacity = '0'; setTimeout(function () { if (n.parentNode) n.parentNode.removeChild(n); }, 500); } }, 22000);
-  }
-
   function notice(msg) {
     var n = document.createElement('div');
     n.style.cssText = 'position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:100000;max-width:min(560px,92vw);' +
@@ -871,7 +727,6 @@ function makeMemIDB() {
         clearInterval(wait); clearInterval(creep); setPct(100);
         if (window.__log) window.__log('ok', 'menu ready');
         hideBoot();
-        setTimeout(askFeedback, 9000);
       }
     }, 150);
     setTimeout(function () { clearInterval(wait); clearInterval(creep); hideBoot(); }, 90000);
